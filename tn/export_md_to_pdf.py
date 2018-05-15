@@ -33,7 +33,7 @@ from ..general_tools.bible_books import BOOK_NUMBERS
 class TnConverter(object):
 
     def __init__(self, ta_tag=None, tn_tag=None, tq_tag=None, tw_tag=None, udb_tag=None, ulb_tag=None, working_dir=None, 
-                 output_dir=None, lang_code='en', books=None):
+                 output_dir=None, lang_code='en', books=None, inline_anchors=False):
         """
         :param ta_tag:
         :param tn_tag:
@@ -56,6 +56,7 @@ class TnConverter(object):
         self.output_dir = output_dir
         self.lang_code = lang_code
         self.books = books
+        self.inline_anchors = inline_anchors
 
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.DEBUG)
@@ -238,7 +239,10 @@ class TnConverter(object):
         if not os.path.isdir(book_dir):
             return
 
-        tn_md = '# translationNotes\n<a id="tn-{0}"/>\n\n'.format(self.book_id)
+        if self.inline_anchors:
+            tn_md = '# translationNotes {{#tn-{0}}}\n\n'.format(self.book_id)
+        else:
+            tn_md = '# translationNotes\n<a id="tn-{0}"/>\n\n'.format(self.book_id)
 
         intro_file = os.path.join(book_dir, 'front', 'intro.md')
         book_has_intro = os.path.isfile(intro_file)
@@ -712,7 +716,7 @@ class TnConverter(object):
         subprocess.call(command, shell=True)
 
 
-def main(ta_tag, tn_tag, tq_tag, tw_tag, udb_tag, ulb_tag, lang_code, books, working_dir, output_dir):
+def main(ta_tag, tn_tag, tq_tag, tw_tag, udb_tag, ulb_tag, lang_code, books, working_dir, output_dir, inline_anchors):
     """
     :param ta_tag:
     :param tn_tag:
@@ -727,7 +731,7 @@ def main(ta_tag, tn_tag, tq_tag, tw_tag, udb_tag, ulb_tag, lang_code, books, wor
     :return:
     """
     tn_converter = TnConverter(ta_tag, tn_tag, tq_tag, tw_tag, udb_tag, ulb_tag, working_dir, output_dir, 
-                               lang_code, books)
+                               lang_code, books, inline_anchors)
     tn_converter.run()
 
 if __name__ == '__main__':
@@ -743,6 +747,7 @@ if __name__ == '__main__':
     parser.add_argument('--tw-tag', dest='tw', default='v8', required=False, help="tW Tag")
     parser.add_argument('--udb-tag', dest='udb', default='v12', required=False, help="UDB Tag")
     parser.add_argument('--ulb-tag', dest='ulb', default='v12', required=False, help="ULB Tag")
+    parser.add_argument('--inline-anchors', dest='inline_anchors', action='store_true', required=False, help='Inline header anchors (for Pandoc 1.17+)')
     args = parser.parse_args(sys.argv[1:])
     main(args.ta, args.tn, args.tq, args.tw, args.udb, args.ulb, args.lang_code, args.books, args.working_dir,
-         args.output_dir)
+         args.output_dir, args.inline_anchors)
