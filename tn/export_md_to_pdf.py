@@ -252,8 +252,12 @@ class TnConverter(object):
             md = self.fix_tn_links(md, 'intro')
             md = self.increase_headers(md)
             md = self.decrease_headers(md, 5)  # bring headers of 5 or more #'s down 1
-            id_tag = '<a id="tn-{0}-front-intro"/>'.format(self.book_id)
-            md = re.compile(r'# ([^\n]+)\n').sub(r'# \1\n{0}\n'.format(id_tag), md, 1)
+            if self.inline_anchors:
+                id_tag = 'tn-{0}-front-intro'.format(self.book_id)
+                md = re.compile(r'# ([^\n]+)\n').sub(r'# \1 {{#{0}}}\n'.format(id_tag), md, 1)
+            else:
+                id_tag = '<a id="tn-{0}-front-intro"/>'.format(self.book_id)
+                md = re.compile(r'# ([^\n]+)\n').sub(r'# \1\n{0}\n'.format(id_tag), md, 1)
             rc = 'rc://{0}/tn/help/{1}/front/intro'.format(self.lang_code, self.book_id)
             anchor_id = 'tn-{1}-front-intro'.format(self.lang_code, self.book_id)
             self.resource_data[rc] = {
