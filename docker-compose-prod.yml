@@ -1,0 +1,26 @@
+version: "3"
+services:
+  api:
+    image: wycliffeassociates/irg9000
+    env_file:
+      - .env
+    volumes:
+      - docker_pdf_output:/output
+    entrypoint:
+      # Configure the server for fastapi, i.e., uvicorn
+      - uvicorn
+      - --host=0.0.0.0
+      - --port=80
+      - --reload
+      - document.entrypoints.app:app
+    ports:
+      - "5005:80"
+  web:
+    build: ./web
+    ports:
+      - "8089:80"
+    volumes:
+      - docker_pdf_output:/srv/content
+
+volumes:
+  docker_pdf_output:
