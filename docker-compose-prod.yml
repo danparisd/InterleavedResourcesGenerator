@@ -4,6 +4,11 @@ services:
     image: wycliffeassociates/irg9000
     env_file:
       - .env
+    environment:
+      FROM_EMAIL_ADDRESS: ${FROM_EMAIL_ADDRESS}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      TO_EMAIL_ADDRESS: ${TO_EMAIL_ADDRESS}
+      SMTP_HOST: ${SMTP_HOST}
     volumes:
       - docker_pdf_output:/output
     entrypoint:
